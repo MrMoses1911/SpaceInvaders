@@ -29,7 +29,7 @@ font = pygame.font.Font(None, 30)  # Default font, size 36
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((30, 40))
+        self.image = pygame.Surface((20, 30))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.rect.centerx = SCREEN_WIDTH // 2
@@ -68,12 +68,12 @@ class Bullet(pygame.sprite.Sprite):
 class Alien(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((40, 40))
+        self.image = pygame.Surface((25, 25))
         self.image.fill(BLUE)
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
         self.rect.y = random.randint(80, 200)
-        self.speed = 2
+        self.speed = 5
 
     def update(self):
         self.rect.x += self.speed
@@ -157,7 +157,7 @@ while running:
             draw_text("You Win! Congratulations!", GREEN, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2)
             draw_text("Press Enter to Exit the Game", WHITE, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50)
         else:
-            draw_text("Game Over! You were hit by an alien!", RED, SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2)
+            draw_text("Game Over! You were hit by an alien!", RED, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2)
             draw_text("Press Enter to Exit the Game", WHITE, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50)
 
         pygame.display.flip()
