@@ -12,6 +12,8 @@ SCREEN_HEIGHT = 720
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
 # Create the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -19,6 +21,9 @@ pygame.display.set_caption("Space Invaders - Bruno Bortoletto")
 
 # Clock for controlling the frame rate
 clock = pygame.time.Clock()
+
+# Font for displaying text
+font = pygame.font.Font(None, 30)  # Default font, size 36
 
 # Player class
 class Player(pygame.sprite.Sprite):
@@ -63,11 +68,11 @@ class Bullet(pygame.sprite.Sprite):
 class Alien(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((40, 30))
-        self.image.fill(WHITE)
+        self.image = pygame.Surface((40, 40))
+        self.image.fill(BLUE)
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
-        self.rect.y = random.randint(50, 200)
+        self.rect.y = random.randint(80, 200)
         self.speed = 2
 
     def update(self):
@@ -91,6 +96,17 @@ for _ in range(10):
     all_sprites.add(alien)
     aliens.add(alien)
 
+# Game variables
+shots_fired = 0
+aliens_eliminated = 0
+game_over = False
+win = False
+
+# Function to display text on the screen
+def draw_text(text, color, x, y):
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, (x, y))
+
 # Game loop
 running = True
 while running:
@@ -104,6 +120,7 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 player.shoot()
+                shots_fired += 1  # Increment shots fired
 
     # Update
     all_sprites.update()
@@ -111,19 +128,51 @@ while running:
     # Check for collisions between bullets and aliens
     hits = pygame.sprite.groupcollide(aliens, bullets, True, True)
 
+    for hit in hits:
+        aliens_eliminated += 1  # Increment aliens eliminated
+
     # Check if all aliens are defeated
     if len(aliens) == 0:
-        print("All aliens defeated! You win!")
+        game_over = True
+        win = True
         running = False
 
     # Check for collisions between player and aliens
     if pygame.sprite.spritecollide(player, aliens, False):
-        print("Game Over! You were hit by an alien!")
+        game_over = True
+        win = False
         running = False
 
     # Draw / render
     screen.fill(BLACK)
     all_sprites.draw(screen)
+
+    # Display shots fired and aliens eliminated
+    draw_text(f"Shots Fired: {shots_fired}", RED, 10, 10)
+    draw_text(f"Aliens Eliminated: {aliens_eliminated}", RED, 10, 50)
+
+# Display win/lose message
+    if game_over:
+        if win:
+            draw_text("You Win! Congratulations!", GREEN, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2)
+            draw_text("Press Enter to Exit the Game", WHITE, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50)
+        else:
+            draw_text("Game Over! You were hit by an alien!", RED, SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2)
+            draw_text("Press Enter to Exit the Game", WHITE, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50)
+
+        pygame.display.flip()
+
+        # Wait for the player to press Enter
+        waiting_for_input = True
+        while waiting_for_input:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    waiting_for_input = False
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:  # Enter key
+                        waiting_for_input = False
+                        running = False
 
     # Flip the display
     pygame.display.flip()
